@@ -146,7 +146,7 @@ export default function Sidebar({ currentPath = "/dashboard" }: SidebarProps) {
 
       {/* Sidebar drawer */}
       <aside className={`
-        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
+        fixed lg:sticky top-0 inset-y-0 left-0 z-50 lg:z-auto
         w-[223px] h-screen
         border-r border-[#E4E5E6] bg-white
         flex flex-col justify-between font-sans select-none shrink-0

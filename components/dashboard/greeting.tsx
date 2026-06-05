@@ -148,8 +148,7 @@ export default function Greeting() {
 
         {/* Right Card: Complete product demo */}
         <div
-          className="border border-[#E5E7EB] border-t-[#E7F3F8] rounded-[8px] px-4 sm:px-5 py-3 sm:py-4 lg:py-5 flex flex-col w-full lg:w-1/2 shadow-sm min-h-[130px] sm:min-h-[150px] lg:h-[166px]"
-          style={{ background: 'linear-gradient(332.99deg, rgba(255, 255, 255, 0.5) 35.17%, rgba(231, 243, 248, 0.5) 83.22%)' }}
+          className="border border-[#E5E7EB] border-t-[#E7F3F8] rounded-[8px] px-4 sm:px-5 py-3 sm:py-4 lg:py-5 flex flex-col w-full lg:w-1/2 shadow-sm min-h-[130px] sm:min-h-[150px] lg:h-[166px] bg-[linear-gradient(332.99deg,rgba(255,255,255,0.5)_35.17%,rgba(231,243,248,0.5)_83.22%)]"
         >
           {/* Card Header */}
           <div className="flex items-start gap-2.5 sm:gap-3 mb-2 sm:mb-3">
