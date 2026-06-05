@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Building2, User, Plus, Check, ClipboardList } from "lucide-react";
+import FindPeopleModal from "./FindPeopleModal";
 
 export default function Greeting() {
   const slides = [
@@ -26,6 +27,7 @@ export default function Greeting() {
   const [currentImage, setCurrentImage] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isFindPeopleOpen, setIsFindPeopleOpen] = useState(false);
 
   const extendedSlides = [...slides, slides[0]];
 
@@ -76,7 +78,10 @@ export default function Greeting() {
             <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#059669] flex-shrink-0" />
             Find Companies
           </button>
-          <button className="flex items-center justify-center gap-[6px] sm:gap-[8px] px-2.5 sm:px-3 h-[30px] sm:h-[34px] border-[1.02px] border-[#E5E7EB] rounded-[6.78px] bg-white text-[#1F2A37] font-['Inter'] font-medium text-[11px] sm:text-[12.26px] leading-[1.5] hover:bg-gray-50 transition-colors shadow-sm whitespace-nowrap">
+          <button 
+            onClick={() => setIsFindPeopleOpen(true)}
+            className="flex items-center justify-center gap-[6px] sm:gap-[8px] px-2.5 sm:px-3 h-[30px] sm:h-[34px] border-[1.02px] border-[#E5E7EB] rounded-[6.78px] bg-white text-[#1F2A37] font-['Inter'] font-medium text-[11px] sm:text-[12.26px] leading-[1.5] hover:bg-gray-50 transition-colors shadow-sm whitespace-nowrap"
+          >
             <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#8B5CF6] flex-shrink-0" />
             Find People
           </button>
@@ -197,6 +202,8 @@ export default function Greeting() {
         </div>
 
       </div>
+      
+      <FindPeopleModal isOpen={isFindPeopleOpen} onClose={() => setIsFindPeopleOpen(false)} />
     </div>
   );
 }
