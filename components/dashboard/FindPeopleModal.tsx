@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   X,
@@ -13,6 +13,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Save,
   Eye,
   Lock,
@@ -47,6 +49,59 @@ export default function FindPeopleModal({ isOpen, onClose }: FindPeopleModalProp
     companyHeadcount: "",
     managementLevel: "",
   });
+
+  const [activeMobileTab, setActiveMobileTab] = useState<"filters" | "results">("filters");
+
+  // Columns definition for mobile table navigation
+  const columns = [
+    { id: "name", label: "Name", width: "18%" },
+    { id: "title", label: "Title", width: "14%" },
+    { id: "headline", label: "Headline", width: "18%" },
+    { id: "linkedin", label: "Linkedin Url", width: "18%" },
+    { id: "company", label: "Company", width: "16%" },
+    { id: "companyUrl", label: "Company Url", width: "16%" },
+  ];
+
+  const [activeColumnIndex, setActiveColumnIndex] = useState(0);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollToIndex = (index: number) => {
+    if (index < 0 || index >= columns.length) return;
+    setActiveColumnIndex(index);
+    
+    const container = tableScrollRef.current;
+    if (!container) return;
+    
+    const columnMinWidths = [144, 112, 144, 144, 128, 128];
+    const scrollLeft = columnMinWidths.slice(0, index).reduce((sum, w) => sum + w, 0);
+    
+    container.scrollTo({
+      left: scrollLeft,
+      behavior: "smooth"
+    });
+  };
+
+  const handleTableScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    
+    const columnMinWidths = [144, 112, 144, 144, 128, 128];
+    let accumulatedWidth = 0;
+    let detectedIndex = 0;
+    
+    for (let i = 0; i < columnMinWidths.length; i++) {
+      accumulatedWidth += columnMinWidths[i];
+      if (scrollLeft < accumulatedWidth - columnMinWidths[i] / 2) {
+        detectedIndex = i;
+        break;
+      }
+      detectedIndex = i;
+    }
+    
+    if (detectedIndex !== activeColumnIndex) {
+      setActiveColumnIndex(detectedIndex);
+    }
+  };
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({
@@ -99,17 +154,57 @@ export default function FindPeopleModal({ isOpen, onClose }: FindPeopleModalProp
       {/* Modal Box */}
       <div className="relative w-full max-w-[1200px] h-[90vh] max-h-[850px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-200/80 z-10 animate-in zoom-in-95 duration-200">
         
-        {/* Close Button Top Right */}
+        {/* Close Button (Desktop) */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-50 p-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors shadow-sm"
+          className="hidden md:flex absolute top-4 right-4 z-50 p-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors shadow-sm"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" />
         </button>
 
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between px-4 py-3.5 bg-white border-b border-gray-100 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="font-['Inter'] font-semibold text-[15px] text-gray-800">Find People</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 active:bg-gray-200 transition-colors"
+            aria-label="Close modal"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Mobile Tab Switcher */}
+        <div className="md:hidden flex border-b border-gray-200 bg-white shrink-0">
+          <button
+            onClick={() => setActiveMobileTab("filters")}
+            className={`flex-1 py-3 text-center font-['Inter'] text-[13px] font-semibold border-b-2 transition-all ${
+              activeMobileTab === "filters"
+                ? "border-[#1A56DB] text-[#1A56DB]"
+                : "border-transparent text-gray-500"
+            }`}
+          >
+            Filters
+          </button>
+          <button
+            onClick={() => setActiveMobileTab("results")}
+            className={`flex-1 py-3 text-center font-['Inter'] text-[13px] font-semibold border-b-2 transition-all ${
+              activeMobileTab === "results"
+                ? "border-[#1A56DB] text-[#1A56DB]"
+                : "border-transparent text-gray-500"
+            }`}
+          >
+            Results
+          </button>
+        </div>
+
         {/* LEFT COLUMN: Sidebar Filters */}
-        <div className="w-full md:w-[320px] lg:w-[350px] bg-[#F9FAFB] border-r border-gray-200/80 flex flex-col h-full shrink-0">
+        <div className={`w-full md:w-[320px] lg:w-[350px] bg-[#F9FAFB] md:border-b-0 md:border-r border-gray-200/80 flex-col flex-1 h-0 md:h-full shrink-0 min-h-0 ${
+          activeMobileTab === "filters" ? "flex" : "hidden md:flex"
+        }`}>
           
           {/* Sidebar Header */}
           <div className="p-4 sm:p-5 pb-3 flex items-center justify-between border-b border-gray-100 bg-white shrink-0">
@@ -398,7 +493,10 @@ export default function FindPeopleModal({ isOpen, onClose }: FindPeopleModalProp
               <Bookmark className="w-3.5 h-3.5 text-[#1F2A37]" />
               Save Search
             </button>
-            <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1F2A37] hover:bg-[#111827] rounded-lg font-['Inter'] font-medium text-[12px] leading-[1.5] tracking-[0px] text-[#FFFFFF] transition-all shadow-sm">
+            <button 
+              onClick={() => setActiveMobileTab("results")}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1F2A37] hover:bg-[#111827] rounded-lg font-['Inter'] font-medium text-[12px] leading-[1.5] tracking-[0px] text-[#FFFFFF] transition-all shadow-sm"
+            >
               <Eye className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Preview Result
             </button>
@@ -407,54 +505,94 @@ export default function FindPeopleModal({ isOpen, onClose }: FindPeopleModalProp
         </div>
 
         {/* RIGHT COLUMN: Results Table Area */}
-        <div className="flex-1 flex flex-col h-full bg-white relative">
+        <div className={`flex-1 flex-col h-0 md:h-full bg-white relative min-w-0 min-h-0 ${
+          activeMobileTab === "results" ? "flex" : "hidden md:flex"
+        }`}>
           
           {/* Header Action Info Row */}
-          <div className="px-6 pt-4 pb-4 border-b border-gray-100 flex flex-col gap-1 shrink-0 pr-16 bg-white z-10">
-            {/* Top Row: Usage badge aligned right */}
-            <div className="flex justify-end">
-              <div className="flex items-center gap-1.5 bg-[#FBECDD] text-[#D9730E] px-3 py-1 rounded-full font-['Lato'] font-medium text-[12px] leading-none tracking-[0px] text-center">
-                <Search className="w-3.5 h-3.5 text-[#D9730E]" />
-                <span>8000/50000</span>modal 
-              </div>
-            </div>
-            
-            {/* Bottom Row: Both texts horizontally aligned */}
-            <div className="flex flex-row items-center justify-between font-['Inter']">
-              <div>
-                <span className="font-['Inter'] font-medium text-[12px] leading-[1.5] tracking-[0px] text-[#4B5563]">
+          <div className="p-4 sm:p-5 sm:px-6 border-b border-gray-100 flex flex-col gap-3 shrink-0 bg-white z-10">
+            {/* Top Row: Title/Status and Usage Badge */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2">
+                <span className="font-['Inter'] font-medium text-[12.5px] sm:text-[13px] leading-[1.5] text-[#4B5563]">
                   Found 0 companies. Click preview to view results
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-[#C27803] font-medium">
-                <Lock className="w-3.5 h-3.5 text-[#C27803]" />
-                <span>
-                  Unlock <span className="font-semibold">100,000 leads</span> with Enterprise Plan*
-                </span>
+              <div className="flex items-center gap-1.5 bg-[#FBECDD] text-[#D9730E] px-3 py-1 rounded-full font-['Lato'] font-semibold text-[11.5px] sm:text-[12px] leading-none shrink-0 self-end sm:self-auto">
+                <Search className="w-3.5 h-3.5 text-[#D9730E]" />
+                <span>8000/50000</span>
+              </div>
+            </div>
+            
+            {/* Bottom Row: Promotion/Callout */}
+            <div className="flex items-center gap-2 text-[11.5px] sm:text-[12px] text-[#C27803] font-medium bg-[#FBECDD]/35 border border-[#FBECDD]/60 px-3.5 py-2 rounded-lg w-full">
+              <Lock className="w-3.5 h-3.5 text-[#C27803] shrink-0" />
+              <span className="leading-[1.4]">
+                Unlock <span className="font-semibold text-[#B25E02]">100,000 leads</span> with Enterprise Plan*
+              </span>
+            </div>
+          </div>
+
+          {/* Table Headers Container (Scrollable horizontally on mobile) */}
+          <div className="shrink-0 w-full border-b border-gray-100 bg-gray-50 flex flex-col">
+            {/* Mobile Column Navigation Control */}
+            <div className="2xl:hidden flex items-center justify-between px-6 py-3 bg-white border-b border-gray-150 select-none font-['Inter']">
+              <button 
+                onClick={() => scrollToIndex(activeColumnIndex - 1)}
+                disabled={activeColumnIndex === 0}
+                className="p-1 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+                aria-label="Previous column"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              <span className="text-[13px] uppercase text-[#1F2A37] tracking-wider font-bold">
+                {columns[activeColumnIndex].label}
+              </span>
+              
+              <button 
+                onClick={() => scrollToIndex(activeColumnIndex + 1)}
+                disabled={activeColumnIndex === columns.length - 1}
+                className="p-1 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+                aria-label="Next column"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Scrollable Column Headers (Hidden on Mobile) */}
+            <div 
+              ref={tableScrollRef} 
+              onScroll={handleTableScroll}
+              className="hidden 2xl:block overflow-x-auto no-scrollbar w-full scroll-smooth"
+            >
+              <div className="min-w-[800px] flex items-center py-3 px-6 select-none font-['Inter'] font-semibold text-[12px] leading-[1.5] tracking-[0px] uppercase text-[#6B7280]">
+                {columns.map((col, idx) => (
+                  <div 
+                    key={col.id} 
+                    style={{ width: col.width }}
+                    className={`truncate transition-all duration-200 ${
+                      activeColumnIndex === idx 
+                        ? "text-[#1A56DB] font-extrabold bg-[#1A56DB]/5 py-0.5 px-1.5 rounded-md" 
+                        : ""
+                    }`}
+                  >
+                    {col.label}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Table Headers */}
-          <div className="flex items-center py-3 px-6 bg-gray-50 border-b border-gray-100 select-none shrink-0 font-['Inter'] font-semibold text-[12px] leading-[1.5] tracking-[0px] uppercase text-[#6B7280]">
-            <div className="w-[18%]">Name</div>
-            <div className="w-[14%]">Title</div>
-            <div className="w-[18%]">Headline</div>
-            <div className="w-[18%]">Linkedin Url</div>
-            <div className="w-[16%]">Company</div>
-            <div className="w-[16%]">Company Url</div>
-          </div>
-
-          {/* Table Body - Empty State Illustration */}
-          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
+          {/* Table Body - Empty State Illustration (Completely outside scroll container to remain centered & fully responsive) */}
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-y-auto no-scrollbar bg-white">
             
             {/* SVG Checklist Illustration */}
-            <div className="relative w-64 h-48 mb-6 flex items-center justify-center">
+            <div className="relative w-full max-w-[200px] sm:max-w-[240px] h-32 sm:h-48 mb-4 sm:mb-6 flex items-center justify-center">
               <Image
                 src="/find-modal.svg"
                 alt="Find People Illustration"
-                width={190}
-                height={150}
+                fill
                 className="object-contain"
                 priority
               />
@@ -462,20 +600,20 @@ export default function FindPeopleModal({ isOpen, onClose }: FindPeopleModalProp
 
             {/* Empty State Instructions */}
             <div className="max-w-[480px] px-4">
-              <p className="font-['Inter'] font-medium text-[13px] sm:text-[14px] leading-[21px] text-gray-400">
+              <p className="font-['Inter'] font-medium text-[11.5px] sm:text-[13px] md:text-[14px] leading-[1.5] text-gray-400">
                 Start your Company search , preview, and import companies
               </p>
-              <p className="font-['Inter'] font-medium text-[13px] sm:text-[14px] leading-[21px] text-gray-400">
+              <p className="font-['Inter'] font-medium text-[11.5px] sm:text-[13px] md:text-[14px] leading-[1.5] text-gray-400">
                 for enrichment by applying any filter in the left panel.
               </p>
               
-              <div className="my-2.5 flex items-center justify-center gap-3 text-gray-300 font-semibold text-[11px] uppercase tracking-wider">
-                <div className="h-px bg-gray-200 w-8"></div>
+              <div className="my-2 flex items-center justify-center gap-3 text-gray-300 font-semibold text-[10px] uppercase tracking-wider">
+                <div className="h-px bg-gray-200 w-6"></div>
                 <span>or</span>
-                <div className="h-px bg-gray-200 w-8"></div>
+                <div className="h-px bg-gray-200 w-6"></div>
               </div>
 
-              <p className="font-['Inter'] font-medium text-[13px] sm:text-[14px] leading-[21px] text-gray-400">
+              <p className="font-['Inter'] font-medium text-[11.5px] sm:text-[13px] md:text-[14px] leading-[1.5] text-gray-400">
                 Import companies from saved Search.
               </p>
             </div>
