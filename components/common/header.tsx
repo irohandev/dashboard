@@ -4,10 +4,10 @@ import { Coins } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="w-full h-[70px] bg-white border-b border-zinc-100 flex items-center justify-end px-6 flex-shrink-0">
+    <header className="hidden lg:flex w-full h-[70px] bg-white border-b border-zinc-100 items-center justify-end px-6 flex-shrink-0">
       <div className="flex items-center gap-4">
         {/* Credits Pill */}
-        <div className="flex items-center gap-[2px] bg-[#EDF3EC] rounded-[10.5px] h-[34px] pl-3 pr-[8px]">
+        <div className="hidden sm:flex items-center gap-[2px] bg-[#EDF3EC] rounded-[10.5px] h-[34px] pl-3 pr-[8px]">
           <div className="flex items-center justify-center gap-2 text-[#438361] mr-2 h-[25px]">
             <Coins className="w-4 h-4" />
             <span className="font-['Lato'] font-medium text-[14px] leading-none text-center">450000/5500000</span>
