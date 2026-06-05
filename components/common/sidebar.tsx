@@ -67,7 +67,7 @@ export default function Sidebar({ currentPath = "/dashboard" }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-[223px] h-screen border-r border-zinc-100 bg-white flex flex-col justify-between font-sans select-none shrink-0">
+    <aside className="w-[223px] h-screen border-r border-[#E4E5E6] bg-white flex flex-col justify-between font-sans select-none shrink-0">
       {/* Top Section */}
       <div className="flex flex-col flex-1 overflow-y-auto">
         {/* Logo */}
@@ -93,15 +93,27 @@ export default function Sidebar({ currentPath = "/dashboard" }: SidebarProps) {
         <div className="px-4 py-3 border-b border-zinc-100/80">
           <button className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-zinc-50 transition-colors duration-200 group text-left">
             <div className="flex items-center gap-3">
-              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-zinc-200">
-                <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&h=120&auto=format&fit=crop"
-                  alt="Workspace Avatar"
-                  fill
-                  sizes="32px"
-                  className="object-cover"
-                  priority
-                />
+              <div className="flex items-center -space-x-3">
+                <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white z-10">
+                  <Image
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&h=120&auto=format&fit=crop"
+                    alt="Workspace Avatar 1"
+                    fill
+                    sizes="32px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white z-0">
+                  <Image
+                    src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=120&h=120&auto=format&fit=crop"
+                    alt="Workspace Avatar 2"
+                    fill
+                    sizes="32px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               </div>
               <span className="font-inter font-medium text-[14px] leading-[150%] tracking-normal text-[#1F2A37]">
                 GTM Spaces
@@ -129,23 +141,21 @@ export default function Sidebar({ currentPath = "/dashboard" }: SidebarProps) {
                     <li key={item.name}>
                       <button
                         onClick={() => setActiveItem(item.path)}
-                        className={`w-[207px] h-[34px] flex items-center justify-between p-[8px] rounded-[8px] border-l text-sm font-medium transition-all duration-200 ${
-                          isActive
+                        className={`w-[207px] h-[34px] flex items-center justify-between p-[8px] rounded-[8px] border-l text-sm font-medium transition-all duration-200 ${isActive
                             ? "bg-[#F3F4F6] text-[#1A56DB] border-l-transparent"
                             : isPlaybook
-                            ? "bg-transparent text-[#9CA3AF] border-l-transparent hover:bg-zinc-50"
-                            : "bg-transparent text-[#1F2A37] border-l-transparent hover:bg-zinc-50"
-                        }`}
+                              ? "bg-transparent text-[#9CA3AF] border-l-transparent hover:bg-zinc-50"
+                              : "bg-transparent text-[#1F2A37] border-l-transparent hover:bg-zinc-50"
+                          }`}
                       >
                         <div className="flex items-center gap-[8px]">
                           <Icon
-                            className={`w-4 h-4 stroke-[2.2] ${
-                              isActive
+                            className={`w-4 h-4 stroke-[2.2] ${isActive
                                 ? "text-[#1A56DB]"
                                 : isPlaybook
-                                ? "text-[#9CA3AF]"
-                                : "text-[#1F2A37]"
-                            }`}
+                                  ? "text-[#9CA3AF]"
+                                  : "text-[#1F2A37]"
+                              }`}
                           />
                           <span className="font-inter font-normal text-[14px] leading-[17.14px] tracking-normal">
                             {item.name}
